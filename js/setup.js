@@ -1,6 +1,6 @@
 'use strict';
 
-let names =
+const names =
   [`Иван`,
     `Хуан Себастьян`,
     `Мария`,
@@ -10,7 +10,7 @@ let names =
     `Люпита`,
     `Вашингтон`];
 
-let surnames =
+const surnames =
   [`да Марья`,
     `Верон`,
     `Мирабелла`,
@@ -20,7 +20,7 @@ let surnames =
     `Нионго`,
     `Ирвинг`];
 
-let coatColors =
+const coatColors =
   [`rgb(101, 137, 164)`,
     `rgb(241, 43, 107)`,
     `rgb(146, 100, 161)`,
@@ -28,58 +28,62 @@ let coatColors =
     `rgb(215, 210, 55)`,
     `rgb(0, 0, 0)`];
 
-let eyesColors =
+const eyesColors =
   [`black`,
     `red`,
     `blue`,
     `yellow`,
     `green`];
 
-let renderRandomObjects = function (array) {
-  function arrayRandElement(arr) {
-    let rand = Math.floor(Math.random() * arr.length);
-    return arr[rand];
-  }
+let arrayRandElement = function (arr) {
+  let rand = Math.floor(Math.random() * arr.length);
+  return arr[rand];
+}
 
+let getRandomObjects = function () {
+  let array = [];
   for (let i = 0; i < 4; i++) {
-    array[i] = {
+    let object = {
       name: arrayRandElement(names) + ` ` + arrayRandElement(surnames),
       coatColor: arrayRandElement(coatColors),
       eyesColor: arrayRandElement(eyesColors)
     };
+    array.push(object);
   }
+  return array;
 };
 
-let randomObjects = [];
 
-renderRandomObjects(randomObjects);
+let renderPlayersSetting = function () {
+  let randomObjects = getRandomObjects();
+  let userDialog = document.querySelector(`.setup`);
+  userDialog.classList.remove(`hidden`);
+  document.querySelector(`.setup-similar`).classList.remove(`hidden`);
 
+  let similarListElement = userDialog.querySelector(`.setup-similar-list`);
 
-let userDialog = document.querySelector(`.setup`);
-userDialog.classList.remove(`hidden`);
-document.querySelector(`.setup-similar`).classList.remove(`hidden`);
+  let similarWizardTemplate = document.querySelector(`#similar-wizard-template`)
+      .content
+      .querySelector(`.setup-similar-item`);
 
-let similarListElement = userDialog.querySelector(`.setup-similar-list`);
+  let renderWizard = function (wizard) {
+    let wizardElement = similarWizardTemplate.cloneNode(true);
 
-let similarWizardTemplate = document.querySelector(`#similar-wizard-template`)
-    .content
-    .querySelector(`.setup-similar-item`);
+    wizardElement.querySelector(`.setup-similar-label`).textContent = wizard.name;
+    wizardElement.querySelector(`.wizard-coat`).style.fill = wizard.coatColor;
+    wizardElement.querySelector(`.wizard-eyes`).style.fill = wizard.eyesColor;
 
-let renderWizard = function (wizard) {
-  let wizardElement = similarWizardTemplate.cloneNode(true);
+    return wizardElement;
+  };
 
-  wizardElement.querySelector(`.setup-similar-label`).textContent = wizard.name;
-  wizardElement.querySelector(`.wizard-coat`).style.fill = wizard.coatColor;
-  wizardElement.querySelector(`.wizard-eyes`).style.fill = wizard.eyesColor;
+  let fragment = document.createDocumentFragment();
+  for (let i = 0; i < randomObjects.length; i++) {
+    fragment.appendChild(renderWizard(randomObjects[i]));
+  }
 
-  return wizardElement;
-};
+  similarListElement.appendChild(fragment);
 
-let fragment = document.createDocumentFragment();
-for (let i = 0; i < randomObjects.length; i++) {
-  fragment.appendChild(renderWizard(randomObjects[i]));
+  userDialog.querySelector(`.setup-similar`).classList.remove(`hidden`);
 }
 
-similarListElement.appendChild(fragment);
-
-userDialog.querySelector(`.setup-similar`).classList.remove(`hidden`);
+renderPlayersSetting();
