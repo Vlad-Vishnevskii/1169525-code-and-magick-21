@@ -35,55 +35,58 @@ const eyesColors =
     `yellow`,
     `green`];
 
-let arrayRandElement = function (arr) {
+const similarWizardTemplate = document.querySelector(`#similar-wizard-template`)
+  .content
+  .querySelector(`.setup-similar-item`);
+
+const userDialog = document.querySelector(`.setup`);
+
+const arrayRandElement = function (arr) {
   let rand = Math.floor(Math.random() * arr.length);
   return arr[rand];
-}
+};
 
-let getRandomObjects = function () {
-  let array = [];
+const getRandomWizard = function () {
+  return {
+    name: arrayRandElement(names) + ` ` + arrayRandElement(surnames),
+    coatColor: arrayRandElement(coatColors),
+    eyesColor: arrayRandElement(eyesColors)
+  };
+};
+
+const getRandomObjects = function () {
+  const array = [];
   for (let i = 0; i < 4; i++) {
-    let object = {
-      name: arrayRandElement(names) + ` ` + arrayRandElement(surnames),
-      coatColor: arrayRandElement(coatColors),
-      eyesColor: arrayRandElement(eyesColors)
-    };
-    array.push(object);
+    array.push(getRandomWizard());
   }
   return array;
 };
 
-
-let renderPlayersSetting = function () {
-  let randomObjects = getRandomObjects();
-  let userDialog = document.querySelector(`.setup`);
+const showSimilarWizards = function () {
   userDialog.classList.remove(`hidden`);
   document.querySelector(`.setup-similar`).classList.remove(`hidden`);
+  userDialog.querySelector(`.setup-similar`).classList.remove(`hidden`);
+};
 
-  let similarListElement = userDialog.querySelector(`.setup-similar-list`);
+const renderWizard = function (wizard) {
+  let wizardElement = similarWizardTemplate.cloneNode(true);
 
-  let similarWizardTemplate = document.querySelector(`#similar-wizard-template`)
-      .content
-      .querySelector(`.setup-similar-item`);
+  wizardElement.querySelector(`.setup-similar-label`).textContent = wizard.name;
+  wizardElement.querySelector(`.wizard-coat`).style.fill = wizard.coatColor;
+  wizardElement.querySelector(`.wizard-eyes`).style.fill = wizard.eyesColor;
 
-  let renderWizard = function (wizard) {
-    let wizardElement = similarWizardTemplate.cloneNode(true);
+  return wizardElement;
+};
 
-    wizardElement.querySelector(`.setup-similar-label`).textContent = wizard.name;
-    wizardElement.querySelector(`.wizard-coat`).style.fill = wizard.coatColor;
-    wizardElement.querySelector(`.wizard-eyes`).style.fill = wizard.eyesColor;
-
-    return wizardElement;
-  };
-
+const fillingElements = function () {
+  const similarListElement = document.querySelector(`.setup-similar-list`);
   let fragment = document.createDocumentFragment();
+  const randomObjects = getRandomObjects();
   for (let i = 0; i < randomObjects.length; i++) {
     fragment.appendChild(renderWizard(randomObjects[i]));
   }
-
   similarListElement.appendChild(fragment);
+};
 
-  userDialog.querySelector(`.setup-similar`).classList.remove(`hidden`);
-}
-
-renderPlayersSetting();
+showSimilarWizards();
+fillingElements();
