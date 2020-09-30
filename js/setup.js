@@ -42,6 +42,9 @@ const fireballColors =
     `#e848d5`,
     `#e6e848`];
 
+const ESCAPE = `Escape`;
+const ENTER = `Enter`;
+
 const similarWizardTemplate = document.querySelector(`#similar-wizard-template`)
   .content
   .querySelector(`.setup-similar-item`);
@@ -57,10 +60,21 @@ const inputWizardEyes = userDialog.querySelector(`input[name=eyes-color]`);
 const inputWizardFireball = userDialog.querySelector(`input[name=fireball-color]`);
 
 const onUserDialogEscPress = function (evt) {
-  if (evt.key === `Escape`) {
+  if (evt.key === ESCAPE) {
     evt.preventDefault();
-    evt.stopPropagation();
-    userDialog.classList.add(`hidden`);
+    closeUserDialog();
+  }
+};
+
+const onUserDialogEnterPressClose = function (evt) {
+  if (evt.key === ENTER) {
+    closeUserDialog();
+  }
+};
+
+const onUserDialogEnterPressOpen = function (evt) {
+  if (evt.key === ENTER) {
+    openUserDialog();
   }
 };
 
@@ -68,12 +82,14 @@ const openUserDialog = function () {
   userDialog.classList.remove(`hidden`);
 
   setupOpen.addEventListener(`keydown`, onUserDialogEscPress);
+  setupOpen.addEventListener(`keydown`, onUserDialogEnterPressOpen);
 };
 
 const closeUserDialog = function () {
   userDialog.classList.add(`hidden`);
 
   setupClose.removeEventListener(`keydown`, onUserDialogEscPress);
+  setupClose.removeEventListener(`keydown`, onUserDialogEnterPressClose);
 };
 
 const arrayRandElement = function (arr) {
@@ -98,7 +114,7 @@ const getRandomObjects = function () {
 };
 
 const renderWizard = function (wizard) {
-  let wizardElement = similarWizardTemplate.cloneNode(true);
+  const wizardElement = similarWizardTemplate.cloneNode(true);
 
   wizardElement.querySelector(`.setup-similar-label`).textContent = wizard.name;
   wizardElement.querySelector(`.wizard-coat`).style.fill = wizard.coatColor;
@@ -117,47 +133,35 @@ const fillingElements = function () {
   similarListElement.appendChild(fragment);
 };
 
-const changeWizardColorFill = function (element, arrayColors, input) {
-  element.style.fill = arrayRandElement(arrayColors);
-  input.value = element.style.fill;
-};
-
-const changeWizardColorBackground = function (element, arrayColors, input) {
-  let randomFireBallColor = arrayRandElement(arrayColors);
-  element.style.background = randomFireBallColor;
-  input.value = randomFireBallColor;
+const changeWizardColor = function (element, arrayColors, input) {
+  if (element.tagName === `SVG`) {
+    element.style.fill = arrayRandElement(arrayColors);
+    input.value = element.style.fill;
+  } else {
+    let randomFireBallColor = arrayRandElement(arrayColors);
+    element.style.background = randomFireBallColor;
+    input.value = randomFireBallColor;
+  }
 };
 
 setupOpen.addEventListener(`click`, function () {
   openUserDialog();
 });
 
-setupOpen.addEventListener(`keydown`, function (evt) {
-  if (evt.key === `Enter`) {
-    openUserDialog();
-  }
-});
-
 setupClose.addEventListener(`click`, function () {
   closeUserDialog();
-});
-
-setupClose.addEventListener(`keydown`, function (evt) {
-  if (evt.key === `Enter`) {
-    closeUserDialog();
-  }
 });
 
 fillingElements();
 
 setupWizardCoat.addEventListener(`click`, function () {
-  changeWizardColorFill(setupWizardCoat, coatColors, inputWizardCoat);
+  changeWizardColor(setupWizardCoat, coatColors, inputWizardCoat);
 });
 
 setupWizardEyes.addEventListener(`click`, function () {
-  changeWizardColorFill(setupWizardEyes, eyesColors, inputWizardEyes);
+  changeWizardColor(setupWizardEyes, eyesColors, inputWizardEyes);
 });
 
 setupWizardFireball.addEventListener(`click`, function () {
-  changeWizardColorBackground(setupWizardFireball, fireballColors, inputWizardFireball);
+  changeWizardColor(setupWizardFireball, fireballColors, inputWizardFireball);
 });
